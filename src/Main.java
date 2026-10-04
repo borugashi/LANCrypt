@@ -1,11 +1,11 @@
 import client.ChatClient;
 import server.ChatServer;
-
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
         System.out.println("|||  LANCrypt v0.1a  |||");
         System.out.println("1. Run server");
         System.out.println("2. Run client");

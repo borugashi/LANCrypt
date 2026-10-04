@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
+import java.io.OutputStreamWriter;
 
 public class ChatClient {
     private final String host;
@@ -22,8 +24,8 @@ public class ChatClient {
         try {
             Socket socket = new Socket(host, port);
             System.out.println("Successfully connected to server!");
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
             Thread recieverThread = new Thread(new Runnable() {
                 @Override
@@ -40,7 +42,7 @@ public class ChatClient {
             });
             recieverThread.start();
 
-            Scanner scanner = new Scanner(System.in);
+            Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
             out.println("[SYSTEM]" + username + " joined to chat");
 
             while (scanner.hasNextLine()) {
