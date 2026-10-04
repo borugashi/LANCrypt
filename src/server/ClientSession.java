@@ -1,18 +1,17 @@
 package server;
 
-import java.io.BufferedReader;
+import model.Message;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class ClientSession implements Runnable{
     private final Socket socket;
     private final ChatServer server;
-    private PrintWriter out;
-    private BufferedReader in;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
     public ClientSession(Socket socket, ChatServer server) {
         this.socket = socket;
@@ -22,23 +21,29 @@ public class ClientSession implements Runnable{
     @Override
     public void run(){
         try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-            out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            in = new ObjectInputStream(socket.getInputStream());
 
-            String message;
-            while ((message = in.readLine()) != null){
+            Message message;
+            while ((message = (Message) in.readObject()) != null){
                 server.broadcast(message);
             }
-        } catch (IOException error) {
+        } catch (IOException | ClassNotFoundException error) {
             //client disconnected
         } finally {
             close();
         }
     }
 
-    public void sendMessage(String message){
-        if (out != null){
-            out.println(message);
+    public void sendMessage(Message message){
+        try {
+            if (out != null){
+                out.writeObject(message);
+                out.flush();
+            }
+        } catch (IOException e) {
+            System.err.println("Send error: " + e.getMessage());
         }
     }
 

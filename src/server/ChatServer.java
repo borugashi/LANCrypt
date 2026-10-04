@@ -1,5 +1,7 @@
 package server;
 
+import model.Message;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -30,7 +32,7 @@ public class ChatServer {
         }
     }
 
-    public synchronized void broadcast(String message){
+    public synchronized void broadcast(Message message){
         for (ClientSession client : clients){
             client.sendMessage(message);
         }
